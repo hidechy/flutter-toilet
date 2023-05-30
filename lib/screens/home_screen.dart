@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_collection_literal
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/toilet.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -35,10 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final googlePlace = GooglePlace(apiKey);
 
-    var response = await googlePlace.search.getNearBySearch(
+    final response = await googlePlace.search.getNearBySearch(
       Location(lat: currentPosition.latitude, lng: currentPosition.longitude),
       1000,
-      keyword: "お手洗い",
+      keyword: '郵便局',
       rankby: RankBy.Distance,
       language: 'ja',
     );
@@ -69,16 +71,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final urlStringVars = [];
       if (Platform.isAndroid) {
-        urlStringVars.add('https://www.google.co.jp/maps/dir/');
         urlStringVars
-            .add('${currentPosition.latitude},${currentPosition.longitude}/');
-        urlStringVars.add('${distination?.lat},${distination?.lng}/');
+          ..add('https://www.google.co.jp/maps/dir/')
+          ..add('${currentPosition.latitude},${currentPosition.longitude}/')
+          ..add('${distination?.lat},${distination?.lng}/');
       } else if (Platform.isIOS) {
-        urlStringVars.add('comgooglemaps://');
-        urlStringVars.add(
-            '?saddr=${currentPosition.latitude},${currentPosition.longitude}');
-        urlStringVars.add('&daddr=${distination?.lat},${distination?.lng}');
-        urlStringVars.add('&directionsmode=walking');
+        urlStringVars
+          ..add('comgooglemaps://')
+          ..add(
+              '?saddr=${currentPosition.latitude},${currentPosition.longitude}')
+          ..add('&daddr=${distination?.lat},${distination?.lng}')
+          ..add('&directionsmode=walking');
       }
       mapUri = Uri.parse(urlStringVars.join());
       //---------------------------//e
@@ -86,11 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         final photoReference = firstResult.photos?.first.photoReference;
 
-        final photoVars = [];
-        photoVars.add('https://maps.googleapis.com');
-        photoVars.add('?maxWidth=400');
-        photoVars.add('&photo_reference=$photoReference');
-        photoVars.add('&key=$apiKey');
+        final photoVars = [
+          'https://maps.googleapis.com',
+          '?maxWidth=2000',
+          '&photo_reference=$photoReference',
+          '&key=$apiKey'
+        ];
 
         toilet = Toilet(firstResult.name, photoVars.join(), distination);
       });
@@ -161,6 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    return await Geolocator.getCurrentPosition();
+    return Geolocator.getCurrentPosition();
   }
 }
